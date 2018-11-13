@@ -1,0 +1,599 @@
+<!-- lihat -->
+<!--<?php 
+        include "koneksi.php";
+        $query_mysql = mysql_query("SELECT * FROM pelanggan")or die(mysql_error());
+        while($data = mysql_fetch_array($query_mysql)){
+        ?>
+    <tr>
+      <td><?php echo $data['id']; ?></td>
+      <td><?php echo $data['nama']; ?></td>
+      <td><?php echo $data['alamat']; ?></td>
+      <td><?php echo $data['kodetarif']; ?></td>
+      <td><a href="editpelanggan.php?id=<?php echo $data['id']; ?>"><i class="fa fa-edit fa-2x"></i></a></td>
+      <td><a href="hapuspelanggan.php?id=<?php echo $data['id']; ?>"><i class="fa fa-trash fa-2x"></i></a></td>
+      </tr>
+<?php } ?>-->
+
+<!-- tambah -->
+<!--<?php 
+include 'koneksi.php';
+$nama = $_POST['nama'];
+$alamat = $_POST['alamat'];
+$kodetarif = $_POST['kodetarif'];
+
+mysql_query("INSERT INTO pelanggan VALUES('','$nama','$alamat','$kodetarif')");
+
+echo"<script> alert('Sukses Menambah User');window.location='pelanggan.php'</script>\n";
+?>
+-->
+
+<!-- edit -->
+<!--<?php 
+include 'koneksi.php';
+$id = $_POST['id'];
+$nama = $_POST['nama'];
+$alamat = $_POST['alamat'];
+$kodetarif = $_POST['kodetarif'];
+
+mysql_query("UPDATE pelanggan SET nama='$nama', alamat='$alamat', kodetarif='$kodetarif' WHERE id='$id'");
+
+echo"<script> alert('Data pelanggan diperbarui');window.location='pelanggan.php'</script>\n";
+?>
+-->
+
+<!-- hapus -->
+<!--<?php 
+include 'koneksi.php';
+$id = $_GET['id'];
+mysql_query("DELETE FROM pelanggan WHERE id='$id'")or die(mysql_error());
+
+echo"<script> alert('Data pelanggan dihapus');window.location='pelanggan.php'</script>\n";
+?>
+-->
+
+<!-- print -->
+<!--<?php
+
+ include "koneksi.php";
+ session_start();
+
+ if (empty($_SESSION['username'])) {
+ 	echo"<script> alert('username atau Password salah!');window.location='index.php'</script>\n";
+ }
+?>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CETAK STRUK PEMBAYARAN</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body onLoad="this.print()" style="background: #f0f0f0; font-family: courier new;">
+
+<div class="container">
+
+<br>
+<a href="pembayaran.php"><b><i class="fa fa-arrow-circle-left"></i> Kembali</b></a>
+<span style="float: right"><b><?php $date=date("d M Y"); echo "$date"; ?></b></span>
+<br>
+<br>
+
+
+<center>
+<div class="row" style="text-align: left;">
+
+    <div class="col-sm-12">
+<div class="panel panel-primary">
+    
+
+    <div class="panel-body">
+
+	<?php 
+	include "koneksi.php";
+	$id = $_GET['id'];
+	$query_mysql = mysql_query("SELECT * FROM pembayaran WHERE id='$id'")or die(mysql_error());
+	while($data = mysql_fetch_array($query_mysql)){
+
+             $id_tag = $data['id_tagihan'];
+
+
+    $queryh=mysql_query("SELECT * FROM pembayaran, tagihan, pelanggan, tarif
+    WHERE pembayaran.id_tagihan=tagihan.id AND tagihan.id='$id_tag' LIMIT 1")or die(mysql_error());
+    while($datas=mysql_fetch_array($queryh)){
+
+    $aidi = $datas['pelanggan_id'];    
+
+    $queryhh=mysql_query("SELECT * FROM tagihan, pelanggan
+    WHERE tagihan.pelanggan_id=pelanggan.id AND pelanggan_id='$aidi' LIMIT 1")or die(mysql_error());
+    while($datass=mysql_fetch_array($queryhh)){
+
+    $kodeta = $datass['kodetarif'];
+
+
+    $queryhhh=mysql_query("SELECT * FROM pelanggan, tarif
+    WHERE pelanggan.kodetarif=tarif.kode AND pelanggan.kodetarif='$kodeta' LIMIT 1")or die(mysql_error());
+    while($datasss=mysql_fetch_array($queryhhh)){
+
+    $daya = $datasss['daya'];
+
+
+        $jumlahp = $data['jumlah_tagihan'];
+        $dendap = $data['biaya_denda'];
+        $adminp = $data['biaya_admin'];
+        $total = $jumlahp + $dendap + $adminp;
+    
+
+	?>
+
+
+<span class="labelheadstruk">PT. LISTRIK PINTAR</span>
+<br>
+<span class="labelstruk">STRUK PEMBAYARAN TAGIHAN LISTRIK</span>
+<span style="float: right;">TANGGAL PEMBAYARAN: <?php echo $data['tanggal_bayar'] ?></span>
+<br>
+<br>
+
+
+
+<table style="font-size: 16px; float: right; margin-right: 100px; width: 330px;">
+
+<tr>
+<td>BULAN / TAHUN</td>
+<td>:</td>
+<td><?php echo $datas['bulantagih'] ?> <?php echo $datas['tahuntagih'] ?></td>
+</tr>
+
+<tr>
+<td>PEMAKAIAN</td>
+<td>:</td>
+<td><?php echo $datas['pemakaian'] ?> kWh</td>
+</tr>
+
+<tr>
+<td>ID TAGIHAN</td>
+<td>:</td>
+<td>#<?php echo $data['id_tagihan'] ?></td>
+</tr>
+
+<tr>
+<td><i>TARIF/KWH</i></td>
+<td>:</td>
+<td><i>RP. <?php echo $datasss['tarif_perkwh'] ?>,-</i></td>
+</tr>
+
+<tr>
+<td><i>BEBAN PPN</i></td>
+<td>:</td>
+<td><i>RP. <?php echo $datasss['beban'] ?>,-</i></td>
+</tr>
+
+</table>
+
+<table style="font-size: 16px;" width="400px;">
+
+<tr>
+<td>ID PELANGGAN</td>
+<td>:</td>
+<td><?php echo $aidi ?></td>
+</tr>
+
+<tr>
+<td>NAMA</td>
+<td>:</td>
+<td><span style="text-transform: uppercase;"><?php echo $datass['nama'] ?></span></td>
+</tr>
+
+<tr>
+<td>KODE / DAYA</td>
+<td>:</td>
+<td><?php echo $datass['kodetarif'] ?> / <?php echo $datasss['daya'] ?></td>
+</tr>
+
+<tr>
+<td>RP. TAGIHAN</td>
+<td>:</td>
+<td>RP. <?php echo $data['jumlah_tagihan'] ?>,- <i>*Termasuk PPN</i></td>
+</tr>
+
+<tr>
+<td>TOTAL DENDA</td>
+<td>:</td>
+<td>RP. <?php echo $data['biaya_denda'] ?>,-</td>
+</tr>
+
+</table>
+
+
+<br>
+<i><b>PT. LISTRIK PINTAR menyatakan struk ini sebagai bukti pembayaran yang sah, mohon disimpan.</b></i>
+<br>
+<br>
+<table style="font-size: 16px;" width="368px;">
+
+<tr>
+<td>ADMIN BANK</td>
+<td>:</td>
+<td>RP. <?php echo $data['biaya_admin'] ?>,-</td>
+</tr>
+
+<tr style="font-weight: bold;">
+<td>TOTAL BAYAR</td>
+<td>:</td>
+<td>RP. <?php echo $total ?>,-</td>
+</tr>
+
+</table>
+
+<br>
+<br>
+<br>
+
+<span style="font-size: 15px;">
+TERIMA KASIH<br>
+"Rincian tagihan dapat dilihat di website resmi PT. LISTRIK PINTAR"<br>
+WWW.LISTRIKPINTAR.CO.ID
+</span>
+
+<?php } } } } ?>
+
+
+
+
+
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</body>
+</html>-->
+
+<!-- admin cek -->
+<!--<?php
+
+ include("koneksi.php");
+
+$username = $_POST['username'];
+$password = $_POST['password'];
+
+// menyesuaikan dengan data di database
+ $perintah = "SELECT * FROM admin WHERE username = '$username' AND password = '$password'";
+ $hasil = mysql_query($perintah);
+ $row = mysql_fetch_array($hasil);
+ if ($row['username'] == $username AND $row['password'] == $password) {
+ session_start(); // memulai fungsi session
+ $_SESSION['username'] = $username;
+ $_SESSION['password'] = $password;
+ header("location:admin.php"); // jika berhasil login, maka masuk ke file home.php
+ }
+ else {
+ 	echo"<script> alert('Username atau Password salah!');window.location='index.php'</script>\n";
+ }
+ ?>-->
+
+ <!-- cek member -->
+ <!--<?php
+
+ include("koneksi.php");
+
+$id = $_POST['memberid'];
+
+// menyesuaikan dengan data di database
+ $perintah = "select * from pelanggan WHERE id = '$memberid'";
+ 
+ $hasil = mysql_query($perintah);
+ 
+ $row = mysql_fetch_array($hasil);
+ 
+ if ($row['id'] == $memberid) {
+ session_start(); // memulai fungsi session
+ 
+ $_SESSION['id'] = $memberid;
+
+ header("location:dash.php"); // jika berhasil login, maka masuk ke file home.php
+ }
+ 
+ else {
+ 	echo"<script> alert('Username atau Password salah!');window.location='index.php'</script>\n";
+ }
+ ?>-->
+ <!-- dash cek -->
+ <!--<?php
+
+ include("koneksi.php");
+$id = $_POST['memberid'];
+
+// menyesuaikan dengan data di database
+ $perintah = "select * from pelanggan WHERE id = '$id'";
+ $hasil = mysql_query($perintah);
+ $row = mysql_fetch_array($hasil);
+ if ($row['id'] == $id) {
+
+ session_start(); // memulai fungsi session
+
+ $_SESSION['id'] = $id;
+
+ }
+
+ if (empty($_SESSION['id'])) {
+ 	echo"<script> alert('Member id yang Anda masukan salah!');window.location='index.php'</script>\n";
+ }
+ 
+ ?>
+-->
+ <!-- admin cek -->
+<!--<?php
+
+ include "koneksi.php";
+ session_start();
+
+ if (empty($_SESSION['username'])) {
+ 	echo"<script> alert('username atau Password salah!');window.location='index.php'</script>\n";
+ }
+?>
+-->
+<!-- konek -->
+<!--<?php
+$host = mysql_connect("localhost","root","");
+$db = mysql_select_db("ukk");
+?>
+-->
+<!-- logot -->
+<!--<?php
+session_start();
+ session_destroy(); // menghapus session
+ 	echo"<script> alert('Anda akan di arahkan ke halaman home');window.location='index.php'</script>\n";
+ ?>-->
+ <!-- cari -->
+ <!--<?php 
+include "koneksi.php";
+$id = $_POST['idcari'];
+
+$query_mysql = mysql_query("SELECT * FROM pelanggan WHERE id='$id'")or die(mysql_error());
+while($data = mysql_fetch_array($query_mysql)){
+?>
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>NAMA</th>
+      <th>ALAMAT</th>
+      <th>KODE</th>
+      <th>EDIT</th>
+      <th>HAPUS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><?php echo $data['id']; ?></td>
+      <td><?php echo $data['nama']; ?></td>
+      <td><?php echo $data['alamat']; ?></td>
+      <td><?php echo $data['kodetarif']; ?></td>
+      <td><a href="editpelanggan.php?id=<?php echo $data['id']; ?>"><i class="fa fa-edit fa-2x"></i></a></td>
+      <td><a href="hapuspelanggan.php?id=<?php echo $data['id']; ?>"><i class="fa fa-trash fa-2x"></i></a></td>
+      </tr>
+<?php } ?>
+
+  </tbody>
+</table>
+-->
+<!-- dashboard -->
+<!-- <?php
+
+ include("koneksi.php");
+$id = $_POST['memberid'];
+
+// menyesuaikan dengan data di database
+ $perintah = "select * from pelanggan WHERE id = '$id'";
+ $hasil = mysql_query($perintah);
+ $row = mysql_fetch_array($hasil);
+ if ($row['id'] == $id) {
+
+ session_start(); // memulai fungsi session
+
+ $_SESSION['id'] = $id;
+
+ }
+
+ if (empty($_SESSION['id'])) {
+  echo"<script> alert('Member id yang Anda masukan salah!');window.location='index.php'</script>\n";
+ }
+ 
+ ?>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listrik pascabayar Ukk</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+div.scroll {
+    width: 100%;
+    height: 500px;
+    overflow: scroll;
+}
+</style>
+
+</head>
+    <?php 
+    $sq = mysql_query("SELECT * from pelanggan where id='$id'");
+    $n = mysql_fetch_array($sq);
+    ?>
+
+<body style="background: #f0f0f0">
+<nav class="navbar" style="background: #3073ad">
+        <div class="container">
+            <div class="navbar-header"><a class="navbar-brand navbar-link" style="color: black; text-shadow: 0px;">LISTRIK PASCABAYAR</a>
+                <button class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
+            </div>
+            <div class="collapse navbar-collapse" id="navcol-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="active" role="presentation"><a class="text-primary bg-success" href="logout.php">LOGOUT</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+<br>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-4">
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+    <strong>DATA PELANGGAN</strong><span class="pull-right"></span>
+    </div>
+
+    <div class="panel-body">
+
+          <table class="table table-hover">
+            <tbody style="font-weight: bold;">
+            <tr>
+            <td>ID PEL</td>
+            <td>:</td>
+            <td>
+              <?php $sq = mysql_query("SELECT * from pelanggan where id='$_SESSION[id]'");
+              $n = mysql_fetch_array($sq);
+              echo"$n[id]";
+              ?>
+            </td>
+            </tr>
+            <tr>
+            <td>NAMA</td>
+            <td>:</td>
+            <td><?php echo"$n[nama]"; ?></td>
+            </tr>
+            <tr>
+            <td>ALAMAT</td>
+            <td>:</td>
+            <td><?php echo"$n[alamat]"; ?></td>
+            </tr>
+            <tr>
+            <td>KODE</td>
+            <td>:</td>
+            <td><?php echo"$n[kodetarif]"; ?></td>
+            </tr>
+            </tbody>
+          </table>
+    </div>
+</div>
+<div class="panel panel-primary">
+    
+    <div class="panel-heading">
+    <strong>INFORMASI LISTRIK</strong><span class="pull-right"></span>
+    </div>
+
+    <div class="panel-body">
+  <?php $sq = mysql_query("SELECT * from tarif, pelanggan where tarif.kode=pelanggan.kodetarif AND pelanggan.kodetarif='$n[kodetarif]'");
+  $n = mysql_fetch_array($sq);
+  ?>
+          <table class="table table-hover">
+            <tbody style="font-weight: bold;">
+            <tr>
+            <td>KODE</td>
+            <td>:</td>
+            <td><?php echo"$n[kode]"; ?></td>
+            </tr>
+            <tr>
+            <td>DAYA</td>
+            <td>:</td>
+            <td><?php echo"$n[daya]"; ?> VA</td>
+            </tr>
+            <tr>
+            <td>RP / KWH</td>
+            <td>:</td>
+            <td>RP. <?php echo"$n[tarif_perkwh]"; ?>,-</td>
+            </tr>
+            <tr>
+            <td>BEBAN</td>
+            <td>:</td>
+            <td>RP. <?php echo"$n[beban]"; ?>,-</td>
+            </tr>
+            </tbody>
+          </table>
+
+    </div>
+
+</div>
+</div>
+<div class="col-sm-8">
+<div class="scroll">
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <strong>INFORMASI TAGIHAN</strong><span class="pull-right"></span>
+    </div>
+<div class="panel-body">
+
+<?php 
+  include "koneksi.php";
+  $query_mysql = mysql_query("SELECT * FROM pelanggan, tagihan where pelanggan.id=tagihan.pelanggan_id AND pelanggan.id='$id'")or die(mysql_error());
+  while($data = mysql_fetch_array($query_mysql)){
+  ?>
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <strong><span class="capitald"><?php echo"$data[bulantagih]"; ?> <?php echo"$data[tahuntagih]"; ?></strong></span>
+    </div>
+<div class="panel-body">
+
+          <table class="table table-hover">
+            <tbody style="font-weight: bold;">
+            <tr>
+            <td>ID TAGIHAN</td>
+            <td>:</td>
+            <td><?php echo"$data[id]"; ?></td>
+            </tr>
+            <tr>
+            <td>PEMAKAIAN</td>
+            <td>:</td>
+            <td><?php echo"$data[pemakaian]"; ?> KWH</td>
+            </tr>
+            <tr>
+            <td>STATUS</td>
+            <td>:</td>
+            <td><?php echo"$data[status]"; ?></td>
+            </tr>
+            </tbody>
+          </table>
+
+
+</div>
+</div>
+
+
+<?php } ?>
+
+
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+<hr style="padding-top: 50px;">
+<div class="jumbotron" style="background: #fff; margin-bottom: -200px; border-top: 3px solid #2b4383">
+<div class="container">
+&copy;2018 PT. LISTRIK PINTAR
+<span style="float: right">
+ERWINDO SIANIPAR</span> 
+</div>
+</div>
+
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+</body>
+
+</html>
+-->
